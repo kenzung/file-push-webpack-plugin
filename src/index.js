@@ -11,9 +11,9 @@ class FilePushWebpackPlugin {
   constructor({
     // find files with a regex
     regex = null,
-    // delete certain files after writing zip
+    // delete certain files after uploading zip-file
     shouldRemoveFiles = true,
-    // the url which your zip file will be sent to
+    // the url which your zip-file will be sent to
     url = null,
     // success callback
     success = null,
