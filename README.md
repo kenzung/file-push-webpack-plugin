@@ -16,7 +16,7 @@ module.export = {
 }
 ```
 ## Accepting Params
-| param | explaination | default value |
+| param | detail | default value |
 | :------------ | :------------- | :-------------: |
 | regex | find files with a regex. | null |
 | shouldRemoveFiles | delete certain files after uploading zip-file | true |
