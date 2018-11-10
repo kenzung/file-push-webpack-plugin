@@ -1,0 +1,1 @@
+This is webpack plugin for sending a zip file to server.

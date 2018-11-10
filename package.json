@@ -1,0 +1,21 @@
+{
+  "name": "file-push-webpack-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint"
+  },
+  "author": "kamyzhong",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.4.11",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
