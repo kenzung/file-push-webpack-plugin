@@ -26,7 +26,7 @@ module.export = {
 | fail | error callback | null |
 
 ## For Koa user
-If you use koa as your node server, the code below may help you to get the zip-file.
+If you use koa as your node server, the example below may help you to get the zip-file.
 
 Maybe you use [koa-body](https://github.com/dlau/koa-body) or others lib that can parse formdata.
 And, you may need a tool to decompress your zip. I recommend the [adm-zip](https://github.com/cthackers/adm-zip) for your first choice.
@@ -34,7 +34,6 @@ And, you may need a tool to decompress your zip. I recommend the [adm-zip](https
 I assume that you use `koa-body` and `adm-zip`.
 ```javascript
 const router = require('koa-router')();
-const sourceMap = require('source-map');
 const koaBody = require('koa-body');
 const fs = require('fs');
 const admZip = require('adm-zip');
