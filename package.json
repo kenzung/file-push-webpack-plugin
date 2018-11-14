@@ -1,6 +1,6 @@
 {
   "name": "file-push-webpack-plugin",
-  "version": "1.0.1.1",
+  "version": "1.0.2",
   "description": "This is webpack plugin for sending a zip file to server.",
   "main": "lib/index.js",
   "repository": "kenzung/file-push-webpack-plugin",
