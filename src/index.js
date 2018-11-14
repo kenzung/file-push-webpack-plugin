@@ -15,6 +15,8 @@ class FilePushWebpackPlugin {
     shouldRemoveFiles = true,
     // the url which your zip-file will be sent to
     url = null,
+    // zip-file name for upload
+    zipFileName = 'temp.zip',
     // success callback
     success = null,
     // error callback,
@@ -28,13 +30,15 @@ class FilePushWebpackPlugin {
     this.shouldRemoveFiles = shouldRemoveFiles;
     this.success = success;
     this.fail = fail;
+    this.zipFileName = zipFileName;
   }
 
   apply(compiler) {
-    const outputPath = compiler.options.output.path;
+    this.outputPath = compiler.options.output.path;
     compiler.plugin('after-emit', (compilation, callback) => {
-      const files = getFiles(outputPath, Object.keys(compilation.assets));
-      this.push(this.makeZip(files));
+      const files = getFiles(this.outputPath, Object.keys(compilation.assets));
+      this.makeZip(files);
+      this.push();
       if (this.shouldRemoveFiles) {
         this.deleteLocalFiles(files);
       }
@@ -47,16 +51,17 @@ class FilePushWebpackPlugin {
     // zip the files
     this.searchLocalFiles(files)
       .forEach(file => zip.addLocalFile(file));
-    return zip.toBuffer();
+    zip.writeZip(path.join(this.outputPath, this.zipFileName));
   }
 
-  push(zipBuffer) {
+  push() {
+    const formData = {
+      zipFile: fs.createReadStream(path.join(this.outputPath, this.zipFileName)),
+    };
     const option = {
       method: 'POST',
       uri: this.url,
-      formData: {
-        zipBuffer,
-      },
+      formData,
     };
     rp.post(option).then((res) => {
       if (this.success) {
@@ -66,6 +71,8 @@ class FilePushWebpackPlugin {
       if (this.fail) {
         this.fail(err);
       }
+    }).finally(() => {
+      fs.unlinkSync(path.join(this.outputPath, this.zipFileName));
     });
   }
 
