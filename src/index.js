@@ -3,10 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const rp = require('request-promise');
 
-function getFiles(outputPath, fileNames) {
-  return fileNames.map(fileName => path.join(outputPath, fileName));
-}
-
 class FilePushWebpackPlugin {
   constructor({
     // find files with a regex
@@ -17,6 +13,8 @@ class FilePushWebpackPlugin {
     url = null,
     // zip-file name for upload
     zipFileName = 'temp.zip',
+    // delete the temp zip-file
+    deleteZipFile = true,
     // success callback
     success = null,
     // error callback,
@@ -31,32 +29,30 @@ class FilePushWebpackPlugin {
     this.success = success;
     this.fail = fail;
     this.zipFileName = zipFileName;
+    this.deleteZipFile = deleteZipFile;
   }
 
   apply(compiler) {
     this.outputPath = compiler.options.output.path;
     compiler.plugin('after-emit', (compilation, callback) => {
-      const files = getFiles(this.outputPath, Object.keys(compilation.assets));
-      this.makeZip(files);
+      this.files = this.searchLocalFiles(this.outputPath, Object.keys(compilation.assets));
+      this.makeZip();
       this.push();
-      if (this.shouldRemoveFiles) {
-        this.deleteLocalFiles(files);
-      }
       callback();
     });
   }
 
-  makeZip(files) {
+  makeZip() {
     const zip = new AdmZip();
     // zip the files
-    this.searchLocalFiles(files)
-      .forEach(file => zip.addLocalFile(file));
+    this.files.forEach(file => zip.addLocalFile(file));
     zip.writeZip(path.join(this.outputPath, this.zipFileName));
   }
 
   push() {
+    const zipPath = path.join(this.outputPath, this.zipFileName);
     const formData = {
-      zipFile: fs.createReadStream(path.join(this.outputPath, this.zipFileName)),
+      zipFile: fs.createReadStream(zipPath),
     };
     const option = {
       method: 'POST',
@@ -72,22 +68,24 @@ class FilePushWebpackPlugin {
         this.fail(err);
       }
     }).finally(() => {
-      fs.unlinkSync(path.join(this.outputPath, this.zipFileName));
+      if (this.deleteZipFile) {
+        fs.unlinkSync(zipPath);
+      }
+      if (this.shouldRemoveFiles) {
+        this.files.forEach(fs.unlinkSync);
+      }
     });
   }
 
-  deleteLocalFiles(files) {
-    this.searchLocalFiles(files).forEach(fs.unlinkSync);
-  }
-
-  searchLocalFiles(files) {
+  searchLocalFiles(outputPath, fileNames) {
     return (
-      files.filter((assetKey) => {
-        if (this.regex) {
-          return this.regex.test(assetKey);
-        }
-        return true;
-      })
+      fileNames.map(fileName => path.join(outputPath, fileName))
+        .filter((assetKey) => {
+          if (this.regex) {
+            return this.regex.test(assetKey);
+          }
+          return true;
+        })
     );
   }
 }
