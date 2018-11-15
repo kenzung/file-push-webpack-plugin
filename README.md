@@ -50,23 +50,42 @@ router.post('/xxx', koaBody({
     throw Error('no zip');
   }
   try {
-    const reader = fs.createReadStream(zipFile.path);
-    const [filename, ext] = zipFile.name.split('.');
-    const zipFileName = `./${filename}.${ext}`;
-    const writer = fs.createWriteStream(zipFileName);
-    writer.on('finish', () => {
-      const zip = new admZip(zipFileName);
-      const dir = `./${filename}`;
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
-      zip.extractAllTo(dir);
-      fs.unlinkSync(zipFileName);
-    });
-    reader.pipe(writer);
+    const [filename] = zipFile.name.split('.');
+    const zip = new admZip(zipFile.path);
+    const dir = `./${filename}`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    zip.extractAllTo(dir);
   } catch (e) {
     console.log(e);
   }
+});
+```
+
+## For Express user
+```javascript
+const multipart = require('connect-multiparty');
+const multipartMiddleware = multipart();
+app.use('/xxx', multipartMiddleware, function(req, res) {
+  const { zipFile } = req.files;
+  if (!zipFile) {
+    throw Error('no zip');
+  }
+  try {
+    const { path: filePath, originalFilename } = zipFile;
+    const [filename] = originalFilename.split('.');
+    const zip = new admZip(filePath);
+    const dir = path.join(__dirname, `${filename}`);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    zip.extractAllTo(dir);
+    fs.unlinkSync(filePath);
+  } catch (e) {
+    console.log(e);
+  }
+  res.end();
 });
 ```
 # License
