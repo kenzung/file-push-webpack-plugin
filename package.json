@@ -12,7 +12,7 @@
     "push",
     "file"
   ],
-  "author": "kamyzhong",
+  "author": "kenzung",
   "license": "MIT",
   "dependencies": {
     "adm-zip": "^0.4.11",

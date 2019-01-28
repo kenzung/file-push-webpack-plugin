@@ -34,12 +34,15 @@ class FilePushWebpackPlugin {
 
   apply(compiler) {
     this.outputPath = compiler.options.output.path;
-    compiler.plugin('after-emit', (compilation, callback) => {
-      this.files = this.searchLocalFiles(this.outputPath, Object.keys(compilation.assets));
-      this.makeZip();
-      this.push();
-      callback();
-    });
+    compiler.hooks.afterEmit.tapAsync(
+      'FilePushWebpackPlugin',
+      (compilation, callback) => {
+        this.files = this.searchLocalFiles(this.outputPath, Object.keys(compilation.assets));
+        this.makeZip();
+        this.push();
+        callback();
+      },
+    );
   }
 
   makeZip() {
