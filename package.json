@@ -1,11 +1,12 @@
 {
   "name": "file-push-webpack-plugin",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "This is webpack plugin for sending a zip file to server.",
   "main": "lib/index.js",
   "repository": "kenzung/file-push-webpack-plugin",
   "scripts": {
-    "lint": "eslint"
+    "lint": "eslint",
+    "release": "npx babel src --out-dir lib"
   },
   "keywords": [
     "webpack",
